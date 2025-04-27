@@ -163,12 +163,18 @@ function getListItem(branch: BranchConfig, type: string): string {
   item += `<!-- ${type}-branch=${branch.branchName} -->`;
   if (branch.prNo) {
     // TODO: types (#22198)
-    item += `[${branch.prTitle!}](../pull/${branch.prNo})`;
+    if (platform.id === 'gitlab') {
+      // Use GitLab-specific MR link format
+      item += `![${branch.prTitle!}](../merge_requests/${branch.prNo})`;
+    } else {
+      // Default link format for other platforms
+      item += `[${branch.prTitle!}](../pull/${branch.prNo})`;
+    }
   } else {
+    // TODO: types (#22198)
     item += branch.prTitle;
   }
   const uniquePackages = [
-    // TODO: types (#22198)
     ...new Set(branch.upgrades.map((upgrade) => `\`${upgrade.depName!}\``)),
   ];
   if (uniquePackages.length < 2) {
